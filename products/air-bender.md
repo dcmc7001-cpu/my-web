@@ -1,0 +1,5 @@
+---
+title: air bender
+price: "69"
+image: /images/img_6817.png
+---
