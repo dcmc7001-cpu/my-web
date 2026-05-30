@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCLADE</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#080808;
+  --paper:#f5f4f0;
+  --ash:#d8d5ce;
+  --fog:#9a9690;
+  --ghost:#ebebea;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Jost','Helvetica Neue',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-weight:300;
+  overflow-x:hidden;cursor:none;
+}
+
+/* CURSOR */
+#cur{
+  position:fixed;width:10px;height:10px;
+  background:var(--ink);border-radius:50%;
+  pointer-events:none;z-index:9000;
+  transform:translate(-50%,-50%);
+  transition:width .25s,height .25s;
+  mix-blend-mode:difference;
+}
+#cur.grow{width:36px;height:36px}
+
+/* LOADER */
+#loader{
+  position:fixed;inset:0;background:var(--ink);z-index:8000;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .8s .3s;
+}
+#loader.out{opacity:0;pointer-events:none}
+.loader-word{
+  font-family:var(--serif);color:var(--paper);
+  font-size:clamp(2.5rem,6vw,5rem);letter-spacing:.45em;
+  font-weight:300;animation:pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:400;
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:center;padding:1.6rem 3rem;
+  background:var(--paper);border-bottom:1px solid var(--ash);
+  transition:padding .3s;
+}
+nav.slim{padding:1rem 3rem}
+.nav-left{display:flex;gap:2.5rem;list-style:none}
+.nav-left a{
+  font-size:.67rem;letter-spacing:.18em;text-transform:uppercase;
+  text-decoration:none;color:var(--ink);font-weight:400;
+  position:relative;padding-bottom:3px;
+}
+.nav-left a::after{
+  content:'';position:absolute;bottom:0;left:0;
+  width:0;height:1px;background:var(--ink);transition:width .3s;
+}
+.nav-left a:hover::after{width:100%}
+.brand{
+  font-family:var(--serif);font-size:1.55rem;font-weight:400;
+  letter-spacing:.35em;text-align:center;text-decoration:none;color:var(--ink);
+}
+.nav-right{display:flex;align-items:center;justify-content:flex-end;gap:1.5rem}
+.nav-act{
+  background:none;border:none;cursor:none;
+  font-family:var(--sans);font-size:.67rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink);font-weight:400;
+}
+.bag-wrap{position:relative}
+.bag-dot{
+  position:absolute;top:-7px;right:-10px;
+  width:15px;height:15px;border-radius:50%;
+  background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:.54rem;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* HERO */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:flex-end;padding:0 3rem 4.5rem;
+  position:relative;overflow:hidden;padding-top:80px;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--ash) 1px,transparent 1px),
+    linear-gradient(90deg,var(--ash) 1px,transparent 1px);
+  background-size:60px 60px;opacity:.45;
+}
+.hero-content{position:relative;z-index:1;max-width:900px}
+.hero-kicker{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--fog);margin-bottom:1.5rem;
+}
+.hero-h1{
+  font-family:var(--serif);font-weight:300;
+  font-size:clamp(4.5rem,10vw,10.5rem);line-height:.88;letter-spacing:-.02em;
+}
+.hero-h1 i{font-style:italic}
+.hero-body{
+  margin-top:2.5rem;font-size:.86rem;line-height:1.9;
+  color:var(--fog);max-width:400px;letter-spacing:.03em;
+}
+.hero-acts{display:flex;gap:1rem;margin-top:2.5rem;flex-wrap:wrap}
+.btn-primary{
+  display:inline-block;padding:.9rem 2.4rem;
+  background:var(--ink);color:var(--paper);
+  font-size:.67rem;letter-spacing:.25em;text-transform:uppercase;
+  border:1px solid var(--ink);text-decoration:none;cursor:none;
+  transition:background .35s,color .35s;
+}
+.btn-primary:hover{background:transparent;color:var(--ink)}
+.btn-ghost{
+  display:inline-block;padding:.9rem 2.4rem;
+  background:transparent;color:var(--ink);
+  font-size:.67rem;letter-spacing:.25em;text-transform:uppercase;
+  border:1px solid var(--ink);text-decoration:none;cursor:none;
+  transition:background .35s,color .35s;
+}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+.hero-side{
+  position:absolute;right:3rem;top:50%;transform:translateY(-50%);
+  writing-mode:vertical-lr;
+  font-family:var(--mono);font-size:.57rem;letter-spacing:.35em;
+  color:var(--ash);text-transform:uppercase;
+}
+
+/* TICKER */
+.ticker{
+  overflow:hidden;
+  border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+  background:var(--ink);padding:.85rem 0;
+}
+.ticker-track{
+  display:flex;gap:3rem;white-space:nowrap;
+  animation:tick 26s linear infinite;
+}
+.ticker-track span{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--paper);flex-shrink:0;
+}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+section{padding:6rem 3rem}
+.sec-label{
+  display:flex;align-items:center;gap:1.5rem;
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--fog);margin-bottom:3.5rem;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--ash)}
+
+/* PRODUCT GRID */
+.pgrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:3rem 2rem;
+}
+.pcard{cursor:none;position:relative}
+.pcard-img{
+  aspect-ratio:2/3;background:var(--ghost);
+  position:relative;overflow:hidden;margin-bottom:1.2rem;
+}
+.pcard-visual{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  transition:transform .7s cubic-bezier(.4,0,.2,1);
+}
+.pcard-icon{font-size:5rem;line-height:1}
+.pcard-mat{
+  font-family:var(--mono);font-size:.54rem;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--ash);
+}
+.pcard:hover .pcard-visual{transform:scale(1.04)}
+.pcard-badge{
+  position:absolute;top:1rem;left:1rem;
+  background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:.54rem;letter-spacing:.15em;
+  padding:.3rem .65rem;text-transform:uppercase;
+}
+.pcard-overlay{
+  position:absolute;inset:0;background:rgba(8,8,8,.72);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .3s;
+}
+.pcard:hover .pcard-overlay{opacity:1}
+.pcard-obx{display:flex;flex-direction:column;gap:.75rem;width:68%}
+.pcard-btn{
+  width:100%;padding:.75rem;
+  border:1px solid var(--paper);background:transparent;color:var(--paper);
+  font-family:var(--sans);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
+  cursor:none;transition:background .25s,color .25s;
+}
+.pcard-btn.fill{background:var(--paper);color:var(--ink)}
+.pcard-btn:hover{background:var(--paper);color:var(--ink)}
+.pcard-btn.fill:hover{background:transparent;color:var(--paper)}
+.pcard-name{font-size:.88rem;letter-spacing:.05em;margin-bottom:.25rem;font-weight:400}
+.pcard-sub{font-size:.7rem;color:var(--fog);letter-spacing:.08em;margin-bottom:.4rem}
+.pcard-price{font-family:var(--mono);font-size:.78rem}
+
+/* EDITORIAL */
+.editorial{
+  display:grid;grid-template-columns:1fr 1fr;
+  border-top:1px solid var(--ash);
+}
+.ed-cell{padding:5.5rem 3rem}
+.ed-cell:first-child{border-right:1px solid var(--ash)}
+.ed-num{
+  font-family:var(--mono);font-size:5rem;font-weight:300;
+  color:var(--ghost);line-height:1;margin-bottom:1.5rem;
+}
+.ed-title{
+  font-family:var(--serif);font-size:2.1rem;font-weight:300;
+  line-height:1.15;margin-bottom:1.5rem;
+}
+.ed-body{font-size:.81rem;line-height:2;color:var(--fog);max-width:420px}
+
+/* NEWSLETTER */
+.newsletter{
+  background:var(--ink);color:var(--paper);
+  padding:5.5rem 3rem;display:flex;
+  align-items:center;justify-content:space-between;gap:4rem;flex-wrap:wrap;
+}
+.nl-left h2{
+  font-family:var(--serif);font-size:2.4rem;font-weight:300;
+  line-height:1.1;max-width:320px;margin-bottom:.75rem;
+}
+.nl-left p{font-size:.76rem;color:rgba(245,244,240,.45);letter-spacing:.05em}
+.nl-form{display:flex;max-width:460px;flex:1}
+.nl-input{
+  flex:1;padding:.9rem 1.2rem;background:transparent;
+  border:1px solid rgba(245,244,240,.2);border-right:none;
+  color:var(--paper);font-family:var(--sans);font-size:.82rem;
+  font-weight:300;outline:none;transition:border-color .2s;
+}
+.nl-input::placeholder{color:rgba(245,244,240,.3)}
+.nl-input:focus{border-color:rgba(245,244,240,.5)}
+.nl-btn{
+  padding:.9rem 1.8rem;background:var(--paper);color:var(--ink);
+  border:1px solid var(--paper);font-size:.64rem;letter-spacing:.22em;
+  text-transform:uppercase;cursor:none;font-weight:400;
+  transition:background .3s,color .3s;
+}
+.nl-btn:hover{background:transparent;color:var(--paper);border-color:var(--paper)}
+
+/* FOOTER */
+footer{
+  padding:2.5rem 3rem;border-top:1px solid var(--ash);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+}
+.footer-copy{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;color:var(--fog)}
+.footer-links{display:flex;gap:2rem}
+.footer-links a{font-size:.62rem;letter-spacing:.1em;color:var(--fog);text-decoration:none;text-transform:uppercase}
+.footer-links a:hover{color:var(--ink)}
+
+/* CART DRAWER */
+.drawer-bg{
+  position:fixed;inset:0;background:rgba(8,8,8,.4);
+  z-index:499;opacity:0;pointer-events:none;transition:opacity .35s;
+}
+.drawer-bg.on{opacity:1;pointer-events:auto}
+.cart-drawer{
+  position:fixed;top:0;right:-500px;width:min(460px,100vw);
+  height:100vh;background:var(--paper);
+  border-left:1px solid var(--ink);z-index:500;
+  display:flex;flex-direction:column;
+  transition:right .4s cubic-bezier(.4,0,.2,1);
+}
+.cart-drawer.open{right:0}
+.drawer-head{
+  padding:2rem;border-bottom:1px solid var(--ash);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.drawer-head h2{font-family:var(--serif);font-size:1.3rem;font-weight:400;letter-spacing:.05em}
+.close-x{background:none;border:none;cursor:none;font-size:1.1rem;color:var(--ink)}
+.drawer-body{flex:1;overflow-y:auto;padding:1.5rem 2rem}
+.cart-empty-msg{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;height:100%;gap:1rem;color:var(--fog);text-align:center;
+}
+.cart-empty-msg .ec{font-size:3rem;opacity:.15}
+.cart-empty-msg p{font-size:.77rem;letter-spacing:.05em}
+.cline{
+  display:flex;gap:1rem;padding:1.2rem 0;
+  border-bottom:1px solid var(--ghost);
+}
+.cline-img{
+  width:72px;height:88px;background:var(--ghost);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+}
+.cline-info{flex:1}
+.cn{font-size:.82rem;letter-spacing:.04em;font-weight:400;margin-bottom:.25rem}
+.cm{font-size:.67rem;color:var(--fog);letter-spacing:.06em;margin-bottom:.5rem}
+.cp{font-family:var(--mono);font-size:.74rem}
+.cr{
+  background:none;border:none;cursor:none;
+  color:var(--ash);font-size:.95rem;align-self:flex-start;transition:color .2s;
+}
+.cr:hover{color:var(--ink)}
+.drawer-foot{padding:1.5rem 2rem;border-top:1px solid var(--ash)}
+.cart-totals{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
+.c-row{display:flex;justify-content:space-between;font-size:.77rem;letter-spacing:.04em}
+.c-row.tot{
+  font-family:var(--mono);font-size:.88rem;
+  padding-top:.75rem;margin-top:.25rem;border-top:1px solid var(--ash);
+}
+.dchk{
+  width:100%;padding:1rem;
+  background:var(--ink);color:var(--paper);border:1px solid var(--ink);
+  font-family:var(--sans);font-size:.67rem;letter-spacing:.25em;text-transform:uppercase;
+  cursor:none;transition:background .3s,color .3s;
+}
+.dchk:hover{background:transparent;color:var(--ink)}
+
+/* MODALS */
+.mbg{
+  position:fixed;inset:0;background:rgba(8,8,8,.58);
+  z-index:600;display:none;align-items:center;justify-content:center;padding:1rem;
+}
+.mbg.on{display:flex}
+.modal{
+  background:var(--paper);width:min(520px,100%);
+  position:relative;border:1px solid var(--ink);max-height:90vh;overflow-y:auto;
+}
+.mx{
+  position:absolute;top:1.25rem;right:1.25rem;
+  background:none;border:none;cursor:none;
+  font-size:1.05rem;color:var(--ink);z-index:1;
+}
+.mp{padding:3rem}
+
+/* LOGIN */
+.l-logo{font-family:var(--serif);font-size:1.55rem;font-weight:400;letter-spacing:.32em;text-align:center;margin-bottom:2rem}
+.l-sub{font-family:var(--mono);font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--fog);text-align:center;margin-bottom:2rem}
+.g-btn{
+  width:100%;padding:.9rem;border:1px solid var(--ash);background:white;
+  display:flex;align-items:center;justify-content:center;gap:.75rem;
+  font-family:var(--sans);font-size:.78rem;letter-spacing:.05em;cursor:none;margin-bottom:1.25rem;
+  transition:border-color .2s;
+}
+.g-btn:hover{border-color:var(--ink)}
+.g-svg{width:18px;height:18px;flex-shrink:0}
+.div{display:flex;align-items:center;gap:1rem;margin:1.25rem 0;font-family:var(--mono);font-size:.57rem;color:var(--ash);letter-spacing:.15em}
+.div::before,.div::after{content:'';flex:1;height:1px;background:var(--ash)}
+.field{margin-bottom:.85rem}
+.field label{display:block;font-family:var(--mono);font-size:.57rem;letter-spacing:.18em;text-transform:uppercase;color:var(--fog);margin-bottom:.4rem}
+.field input,.field select{
+  width:100%;padding:.82rem 1rem;border:1px solid var(--ash);
+  background:transparent;font-family:var(--sans);font-size:.85rem;font-weight:300;
+  outline:none;transition:border-color .2s;color:var(--ink);
+}
+.field input:focus,.field select:focus{border-color:var(--ink)}
+.fb{
+  width:100%;padding:.92rem;background:var(--ink);color:var(--paper);
+  border:1px solid var(--ink);font-family:var(--sans);
+  font-size:.67rem;letter-spacing:.25em;text-transform:uppercase;
+  cursor:none;margin-top:.5rem;transition:background .3s,color .3s;
+}
+.fb:hover{background:transparent;color:var(--ink)}
+.fb.lt{background:transparent;color:var(--ink)}
+.fb.lt:hover{background:var(--ink);color:var(--paper)}
+.s-chip{display:flex;align-items:center;gap:.6rem;font-size:.67rem;letter-spacing:.04em;color:var(--fog)}
+.s-av{
+  width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;
+}
+
+/* DETAIL */
+.det-modal .modal{width:min(780px,100%)}
+.det-grid{display:grid;grid-template-columns:1fr 1fr}
+.det-img{
+  aspect-ratio:2/3;background:var(--ghost);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+}
+.det-emoji{font-size:7rem;line-height:1}
+.det-mat{font-family:var(--mono);font-size:.54rem;letter-spacing:.25em;text-transform:uppercase;color:var(--ash)}
+.det-info{padding:3rem}
+.det-name{font-family:var(--serif);font-size:1.9rem;font-weight:300;line-height:1.1;margin-bottom:.4rem}
+.det-price{font-family:var(--mono);font-size:1rem;margin-bottom:1.5rem}
+.det-desc{font-size:.79rem;line-height:1.95;color:var(--fog);margin-bottom:2rem;letter-spacing:.03em}
+.sz-lbl{font-family:var(--mono);font-size:.57rem;letter-spacing:.2em;text-transform:uppercase;color:var(--fog);margin-bottom:.7rem}
+.szs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
+.sz{
+  padding:.5rem .9rem;border:1px solid var(--ash);background:none;
+  font-family:var(--mono);font-size:.67rem;cursor:none;
+  transition:all .2s;color:var(--ink);
+}
+.sz:hover,.sz.on{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+
+/* CHECKOUT */
+.ck-modal .modal{width:min(680px,100%)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ash)}
+.stab{
+  padding:1.1rem .5rem;text-align:center;
+  font-family:var(--mono);font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--fog);border-right:1px solid var(--ash);
+  transition:background .25s,color .25s;
+}
+.stab:last-child{border-right:none}
+.stab.cur{background:var(--ink);color:var(--paper)}
+.stab.done{background:var(--ghost);color:var(--ink)}
+.ck-body{padding:2.5rem}
+.ck-body h3{font-family:var(--serif);font-size:1.6rem;font-weight:300;margin-bottom:2rem}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.olines{background:var(--ghost);padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+.oline{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.77rem;letter-spacing:.04em;padding:.35rem 0;
+}
+.otot{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:.88rem;
+  padding-top:.85rem;margin-top:.5rem;border-top:1px solid var(--ash);
+}
+.pay-methods{display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.pm{
+  flex:1;min-width:80px;padding:.7rem .4rem;
+  border:1px solid var(--ash);background:none;
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  cursor:none;transition:all .2s;color:var(--ink);
+}
+.pm:hover,.pm.on{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.success-w{text-align:center;padding:1rem 0}
+.s-ring{
+  width:64px;height:64px;border:1px solid var(--ink);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;margin:0 auto 1.5rem;
+}
+.success-w h3{font-family:var(--serif);font-size:2rem;font-weight:300;margin-bottom:.85rem}
+.success-w p{font-size:.77rem;line-height:1.95;color:var(--fog);letter-spacing:.04em}
+
+/* GOOGLE SIGN-IN */
+.g-signin-wrap{
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.25rem;min-height:44px;
+}
+.g-signed-chip{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.65rem 1rem;border:1px solid var(--ash);
+  background:var(--ghost);margin-bottom:1.25rem;
+}
+.g-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.g-avatar-init{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-family:var(--mono);flex-shrink:0;
+}
+.g-user-info{flex:1;min-width:0}
+.g-user-name{font-size:.78rem;font-weight:400;letter-spacing:.03em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-user-email{font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;
+  color:var(--fog);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.15rem}
+.g-signout{
+  background:none;border:none;cursor:none;
+  font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--fog);transition:color .2s;padding:0;
+}
+.g-signout:hover{color:var(--ink)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:2rem;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--ink);color:var(--paper);
+  padding:.8rem 2rem;font-family:var(--mono);
+  font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
+  z-index:9001;transition:transform .4s cubic-bezier(.4,0,.2,1);
+  white-space:nowrap;pointer-events:none;
+}
+.toast.up{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:768px){
+  nav{grid-template-columns:auto 1fr auto;gap:1rem;padding:1.2rem 1.25rem}
+  .nav-left{display:none}
+  .brand{text-align:left;font-size:1.2rem;letter-spacing:.2em}
+  section{padding:4rem 1.25rem}
+  .hero{padding:80px 1.25rem 4rem}
+  .hero-side{display:none}
+  .editorial{grid-template-columns:1fr}
+  .ed-cell:first-child{border-right:none;border-bottom:1px solid var(--ash)}
+  .newsletter{padding:4rem 1.25rem;flex-direction:column}
+  .det-grid{grid-template-columns:1fr}
+  .det-modal .modal{width:100%}
+  footer{flex-direction:column;text-align:center}
+  .r2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="loader"><div class="loader-word">SCLADE</div></div>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <ul class="nav-left">
+    <li><a href="#collection">Collection</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <a href="#" class="brand">SCLADE</a>
+  <div class="nav-right">
+    <div id="auth-area">
+      <button class="nav-act" onclick="openMod('lmod')">Sign In</button>
+    </div>
+    <button class="nav-act bag-wrap" onclick="openDrawer()">
+      Bag<span class="bag-dot" id="bag-n">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <p class="hero-side">SS 2025 — Limited Edition</p>
+  <div class="hero-content">
+    <p class="hero-kicker">New Arrivals — Summer 2025</p>
+    <h1 class="hero-h1">Wear<br>the <i>void</i></h1>
+    <p class="hero-body">Fashion built on absence. Each piece exists at the intersection of restraint and precision — designed for those who find meaning in what is left out.</p>
+    <div class="hero-acts">
+      <a href="#collection" class="btn-primary">Shop Collection</a>
+      <a href="#about" class="btn-ghost">Our Philosophy</a>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span>Restraint</span><span>—</span><span>Precision</span><span>—</span>
+    <span>Form</span><span>—</span><span>Silence</span><span>—</span>
+    <span>Free shipping above ₹5,000</span><span>—</span>
+    <span>14-day returns</span><span>—</span>
+    <span>Sustainably made</span><span>—</span>
+    <span>Restraint</span><span>—</span><span>Precision</span><span>—</span>
+    <span>Form</span><span>—</span><span>Silence</span><span>—</span>
+    <span>Free shipping above ₹5,000</span><span>—</span>
+    <span>14-day returns</span><span>—</span>
+    <span>Sustainably made</span><span>—</span>
+  </div>
+</div>
+
+<!-- COLLECTION -->
+<section id="collection">
+  <div class="sec-label">01 — The Collection</div>
+  <div class="pgrid" id="pgrid"></div>
+</section>
+
+<!-- EDITORIAL / ABOUT -->
+<div class="editorial" id="about">
+  <div class="ed-cell">
+    <div class="ed-num">01</div>
+    <h2 class="ed-title">Nothing added.<br>Nothing removed.</h2>
+    <p class="ed-body">Sclade began with a single question: what remains when everything unnecessary is stripped away? We design from subtraction — each piece a study in reduction, each choice deliberate, every detail earned.</p>
+  </div>
+  <div class="ed-cell">
+    <div class="ed-num">02</div>
+    <h2 class="ed-title">Every seam<br>is a decision.</h2>
+    <p class="ed-body">Produced in small runs by independent ateliers. No seasonal pressure. No trend chasing. We release when the work is ready, and only as many as the craft allows. Sustainability as a consequence of care.</p>
+  </div>
+</div>
+
+<!-- NEWSLETTER -->
+<div class="newsletter">
+  <div class="nl-left">
+    <h2>Stay in the quiet</h2>
+    <p>New arrivals. No noise.</p>
+  </div>
+  <div class="nl-form">
+    <input class="nl-input" type="email" placeholder="your@email.com">
+    <button class="nl-btn" onclick="showToast('You\'re on the list.')">Subscribe</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p class="footer-copy">© 2025 Sclade. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Shipping</a>
+    <a href="#">Returns</a>
+  </div>
+</footer>
+
+<!-- DRAWER BG -->
+<div class="drawer-bg" id="dbg" onclick="closeDrawer()"></div>
+
+<!-- CART DRAWER -->
+<div class="cart-drawer" id="cdrawer">
+  <div class="drawer-head">
+    <h2>Shopping Bag</h2>
+    <button class="close-x" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="dbody"></div>
+  <div class="drawer-foot" id="dfoot" style="display:none">
+    <div class="cart-totals">
+      <div class="c-row"><span>Subtotal</span><span id="csub"></span></div>
+      <div class="c-row"><span>Shipping</span><span id="cship"></span></div>
+      <div class="c-row tot"><span>Total</span><span id="ctot"></span></div>
+    </div>
+    <button class="dchk" onclick="startCheckout()">Checkout →</button>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="mbg" id="lmod" onclick="bgc(event,'lmod')">
+  <div class="modal">
+    <button class="mx" onclick="closeMod('lmod')">✕</button>
+    <div class="mp">
+      <div class="l-logo">SCLADE</div>
+      <p class="l-sub">Sign in to continue</p>
+
+      <!-- Google One Tap initialiser (hidden) -->
+      <div id="g_id_onload"
+           data-client_id="647753311601-v008q3264d08ql216ib3mu3td604ee0j.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
+
+      <!-- Official Google Sign-In button -->
+      <div class="g-signin-wrap">
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="continue_with"
+             data-size="large"
+             data-logo_alignment="left"
+             data-width="400">
+        </div>
+      </div>
+
+      <div class="div">or</div>
+      <div class="field"><label>Email</label><input type="email" id="le" placeholder="your@email.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="lp" placeholder="••••••••"></div>
+      <button class="fb" onclick="emailLogin()">Sign In</button>
+      <button class="fb lt" style="margin-top:.5rem" onclick="emailLogin()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="mbg det-modal" id="dmod" onclick="bgc(event,'dmod')">
+  <div class="modal">
+    <button class="mx" onclick="closeMod('dmod')">✕</button>
+    <div class="det-grid">
+      <div class="det-img">
+        <div class="det-emoji" id="demoji"></div>
+        <div class="det-mat" id="dmat"></div>
+      </div>
+      <div class="det-info">
+        <div class="det-name" id="dname"></div>
+        <div class="det-price" id="dprice"></div>
+        <div class="det-desc" id="ddesc"></div>
+        <div class="sz-lbl">Select Size</div>
+        <div class="szs" id="dszs"></div>
+        <button class="fb" onclick="addFromDetail()">Add to Bag</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="mbg ck-modal" id="ckmod" onclick="bgc(event,'ckmod')">
+  <div class="modal">
+    <button class="mx" onclick="closeMod('ckmod')">✕</button>
+    <div class="steps">
+      <div class="stab cur" id="st1">Delivery</div>
+      <div class="stab" id="st2">Payment</div>
+      <div class="stab" id="st3">Review</div>
+      <div class="stab" id="st4">Done</div>
+    </div>
+    <div class="ck-body" id="ckbody"></div>
+  </div>
+</div>
+
+<!-- CRAWLER BACKUP FOR DEPLOYMENT RECOGNITION -->
+<form name="checkout-form" method="POST" data-netlify="true" hidden>
+  <input type="text" name="first_name">
+  <input type="text" name="last_name">
+  <input type="email" name="email">
+  <input type="tel" name="phone">
+  <input type="text" name="address">
+  <input type="text" name="city">
+  <input type="text" name="pincode">
+  <input type="text" name="state">
+  <input type="text" name="payment_method">
+  <input type="text" name="card_number">
+  <input type="text" name="card_expiry">
+  <input type="text" name="card_cvv">
+  <input type="text" name="card_name">
+  <input type="text" name="upi_id">
+  <input type="text" name="bank_name">
+  <input type="text" name="ordered_items">
+  <input type="text" name="order_total">
+</form>
+
+<script>
+/* CURSOR */
+const cur = document.getElementById('cur');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.classList.add('grow'));
+  el.addEventListener('mouseleave', () => cur.classList.remove('grow'));
+});
+
+/* LOADER */
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('out'), 900);
+});
+
+/* NAV SCROLL */
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('slim', scrollY > 60);
+});
+
+/* TOAST */
+let tT;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('up');
+  clearTimeout(tT); tT = setTimeout(() => t.classList.remove('up'), 3000);
+}
+
+/* MODALS */
+function openMod(id) { document.getElementById(id).classList.add('on'); }
+function closeMod(id) { document.getElementById(id).classList.remove('on'); }
+function bgc(e, id) { if (e.target === document.getElementById(id)) closeMod(id); }
+
+/* PRODUCTS */
+const prods = [
+  {id:1,name:'Column Coat',type:'Outerwear',mat:'Virgin Wool',price:18500,emoji:'🧥',badge:'New',desc:'A single column of pressed wool that falls in one unwavering line. Two interior pockets, clean horn-button closure, zero external hardware. Fully unlined for quiet drape.'},
+  {id:2,name:'Void Trouser',type:'Trousers',mat:'Japanese Cotton',price:9200,emoji:'👖',badge:'',desc:'Wide-leg trousers cut from deadstock Japanese cotton twill. High rise, relaxed through the thigh, tapered below the knee. Invisible side-seam pockets.'},
+  {id:3,name:'Silence Shirt',type:'Tops',mat:'Organic Cotton',price:7400,emoji:'👔',badge:'Limited',desc:'Oversized woven shirt in 100% organic cotton. Drop shoulder, single chest pocket. The fabric speaks. The details stay quiet.'},
+  {id:4,name:'Arc Dress',type:'Dresses',mat:'Deadstock Linen',price:13800,emoji:'👗',badge:'New',desc:'The entire silhouette reads as one arcing gesture. Falls mid-calf, side seam pockets, concealed back zip. Available in chalk and carbon.'},
+  {id:5,name:'Grain Knit',type:'Knitwear',mat:'Merino Wool',price:11200,emoji:'🧶',badge:'',desc:'Boxy ribbed knit in salt-and-pepper merino. Crew neck, dropped shoulders, relaxed body. Grows more beautiful with every wear.'},
+  {id:6,name:'Form Blazer',type:'Tailoring',mat:'Italian Wool',price:22000,emoji:'🥼',badge:'Bestseller',desc:'Single-button blazer with structured shoulders and clean back vent. Unlined for lightness, hand-stitched lapels, notched chest pocket.'},
+  {id:7,name:'Seam Trench',type:'Outerwear',mat:'Cotton Gabardine',price:24500,emoji:'🧣',badge:'',desc:'A trench stripped to its structural logic. Double-breasted, storm-flap collar, belted. Nothing decorative. Everything necessary.'},
+  {id:8,name:'Plane Tee',type:'Tops',mat:'Pima Cotton',price:4200,emoji:'👕',badge:'',desc:'The foundation. A perfect-weight pima cotton tee with micro-dropped shoulders and imperceptibly longer back hem. Washes beautifully.'},
+];
+
+/* RENDER PRODUCTS */
+document.getElementById('pgrid').innerHTML = prods.map(p => `
+  <div class="pcard">
+    <div class="pcard-img">
+      <div class="pcard-visual">
+        <div class="pcard-icon">${p.emoji}</div>
+        <div class="pcard-mat">${p.mat}</div>
+      </div>
+      ${p.badge?`<div class="pcard-badge">${p.badge}</div>`:''}
+      <div class="pcard-overlay">
+        <div class="pcard-obx">
+          <button class="pcard-btn fill" onclick="qadd(${p.id})">Quick Add</button>
+          <button class="pcard-btn" onclick="openDetail(${p.id})">View Details</button>
+        </div>
+      </div>
+    </div>
+    <div class="pcard-name">${p.name}</div>
+    <div class="pcard-sub">${p.type}</div>
+    <div class="pcard-price">₹${p.price.toLocaleString('en-IN')}</div>
+  </div>
+`).join('');
+
+/* RE-BIND cursor for dynamic elements */
+function bindCursor() {
+  document.querySelectorAll('a,button').forEach(el => {
+    el.onmouseenter = () => cur.classList.add('grow');
+    el.onmouseleave = () => cur.classList.remove('grow');
+  });
+}
+bindCursor();
+
+/* CART */
+let cart = [], user = null, activeProd = null, chSz = 'M';
+
+function cartSub()  { return cart.reduce((a,c) => a + c.price * c.qty, 0); }
+function cartShip() { return cartSub() >= 5000 ? 0 : 299; }
+function cartGrand(){ return cartSub() + cartShip(); }
+
+function updBag() {
+  document.getElementById('bag-n').textContent = cart.reduce((a,c) => a + c.qty, 0);
+}
+
+function renderCart() {
+  const body = document.getElementById('dbody');
+  const foot = document.getElementById('dfoot');
+  updBag();
+  if (!cart.length) {
+    body.innerHTML = `<div class="cart-empty-msg"><div class="ec">○</div><p>Your bag is empty.</p><p style="font-size:.7rem">Something beautiful awaits.</p></div>`;
+    foot.style.display = 'none'; return;
+  }
+  foot.style.display = 'block';
+  body.innerHTML = cart.map((item,i) => `
+    <div class="cline">
+      <div class="cline-img">${item.emoji}</div>
+      <div class="cline-info">
+        <div class="cn">${item.name}</div>
+        <div class="cm">Size ${item.size} · Qty ${item.qty}</div>
+        <div class="cp">₹${(item.price*item.qty).toLocaleString('en-IN')}</div>
+      </div>
+      <button class="cr" onclick="rmItem(${i})">✕</button>
+    </div>
+  `).join('');
+  const sub = cartSub(), sh = cartShip();
+  document.getElementById('csub').textContent  = '₹' + sub.toLocaleString('en-IN');
+  document.getElementById('cship').textContent = sh === 0 ? 'Free' : '₹' + sh;
+  document.getElementById('ctot').textContent  = '₹' + cartGrand().toLocaleString('en-IN');
+  bindCursor();
+}
+
+function rmItem(i) { cart.splice(i,1); renderCart(); }
+
+function addToCart(p, sz) {
+  const ex = cart.find(c => c.id===p.id && c.size===sz);
+  if (ex) ex.qty++; else cart.push({...p,size:sz,qty:1});
+  renderCart(); showToast(p.name + ' added to bag');
+}
+
+function qadd(id) { addToCart(prods.find(p => p.id===id), 'M'); }
+
+/* DRAWER */
+function openDrawer() {
+  renderCart();
+  document.getElementById('cdrawer').classList.add('open');
+  document.getElementById('dbg').classList.add('on');
+}
+function closeDrawer() {
+  document.getElementById('cdrawer').classList.remove('open');
+  document.getElementById('dbg').classList.remove('on');
+}
+
+/* ── GOOGLE IDENTITY SERVICES ─────────────────────────────────── */
+
+function handleCredentialResponse(response) {
+  try {
+    const payload = JSON.parse(
+      atob(response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))
+    );
+
+    const firstName = (payload.given_name || payload.name || 'User').split(' ')[0];
+    const initials  = ((payload.given_name||'?')[0] + (payload.family_name||'?')[0]).toUpperCase();
+
+    user = {
+      name    : payload.name  || firstName,
+      email   : payload.email || '',
+      picture : payload.picture || '',
+      initials: initials,
+      token   : response.credential,
+    };
+
+    setAuthArea();
+    closeMod('lmod');
+    showToast('Welcome, ' + firstName + ' — signed in with Google');
+  } catch (err) {
+    console.error('GIS token decode error:', err);
+    showToast('Google sign-in failed. Please try again.');
+  }
+}
+
+function googleSignOut() {
+  if (window.google && user) {
+    google.accounts.id.revoke(user.email, () => {});
+  }
+  user = null;
+  setAuthArea();
+  showToast('Signed out successfully');
+}
+
+function setAuthArea() {
+  const a = document.getElementById('auth-area');
+  if (user) {
+    const avatarHTML = user.picture
+      ? `<img class="g-avatar" src="${user.picture}" alt="${user.name}" referrerpolicy="no-referrer">`
+      : `<div class="g-avatar-init">${user.initials}</div>`;
+
+    a.innerHTML = `
+      <div class="s-chip" title="${user.email}">
+        ${avatarHTML}
+        <span>${user.name.split(' ')[0]}</span>
+        <button class="g-signout" onclick="googleSignOut()" title="Sign out">✕</button>
+      </div>`;
+  } else {
+    a.innerHTML = `<button class="nav-act" onclick="openMod('lmod')">Sign In</button>`;
+  }
+  bindCursor();
+}
+
+function emailLogin() {
+  const email = document.getElementById('le').value.trim();
+  if (!email) { showToast('Please enter your email'); return; }
+  const name     = email.split('@')[0];
+  const initials = name.slice(0,2).toUpperCase();
+  user = { name, email, picture:'', initials, token: null };
+  setAuthArea(); closeMod('lmod'); showToast('Welcome, ' + name);
+}
+
+/* DETAIL */
+function openDetail(id) {
+  activeProd = prods.find(p => p.id===id); chSz = 'M';
+  document.getElementById('demoji').textContent = activeProd.emoji;
+  document.getElementById('dmat').textContent   = activeProd.mat;
+  document.getElementById('dname').textContent  = activeProd.name;
+  document.getElementById('dprice').textContent = '₹' + activeProd.price.toLocaleString('en-IN');
+  document.getElementById('ddesc').textContent  = activeProd.desc;
+  const szs = ['XS','S','M','L','XL'];
+  document.getElementById('dszs').innerHTML = szs.map(s =>
+    `<button class="sz${s==='M'?' on':''}" onclick="pickSz('${s}',this)">${s}</button>`
+  ).join('');
+  openMod('dmod'); bindCursor();
+}
+function pickSz(s, btn) {
+  chSz = s;
+  document.querySelectorAll('#dszs .sz').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function addFromDetail() {
+  addToCart(activeProd, chSz); closeMod('dmod');
+}
+
+/* ── CHECKOUT ENGINE WITH GLOBAL DATA RETENTION ─────────────────── */
+let cStep = 1;
+let payMode = 'card';
+
+function startCheckout() {
+  if (!user) { closeDrawer(); openMod('lmod'); return; }
+  if (!cart.length) { showToast('Your bag is empty'); return; }
+  cStep = 1; 
+  closeDrawer(); 
+  
+  // Build persistent form container once so data is never discarded
+  const body = document.getElementById('ckbody');
+  body.innerHTML = `
+    <form method="POST" data-netlify="true" name="checkout-form" id="netlify-checkout-form" onsubmit="event.preventDefault();">
+      <input type="hidden" name="form-name" value="checkout-form" />
+      
+      <!-- Persistent View Modules -->
+      <div id="step-delivery-view"></div>
+      <div id="step-payment-view" style="display:none;"></div>
+      <div id="step-review-view" style="display:none;"></div>
+      <div id="step-success-view" style="display:none;"></div>
+    </form>
+  `;
+
+  // Pre-render content elements inside the permanent fields tree
+  document.getElementById('step-delivery-view').innerHTML = deliveryHTML();
+  document.getElementById('step-payment-view').innerHTML = paymentHTML();
+  
+  renderStep(); 
+  openMod('ckmod');
+}
+
+function setStepUI() {
+  for (let i=1;i<=4;i++) {
+    document.getElementById('st'+i).className = 'stab' + (i===cStep?' cur':(i<cStep?' done':''));
+  }
+}
+
+function nextStep() { 
+  cStep++; 
+  renderStep(); 
+}
+
+function renderStep() {
+  setStepUI();
+  
+  const v1 = document.getElementById('step-delivery-view');
+  const v2 = document.getElementById('step-payment-view');
+  const v3 = document.getElementById('step-review-view');
+  const v4 = document.getElementById('step-success-view');
+
+  if (!v1 || !v2 || !v3 || !v4) return;
+
+  // Toggle stage layouts safely without rewriting inner DOM structures
+  if (cStep === 1) {
+    v1.style.display = "block"; v2.style.display = "none"; v3.style.display = "none"; v4.style.display = "none";
+  } else if (cStep === 2) {
+    v1.style.display = "none"; v2.style.display = "block"; v3.style.display = "none"; v4.style.display = "none";
+  } else if (cStep === 3) {
+    // Generate fresh structural overview totals during transition
+    v3.innerHTML = reviewHTML();
+    v1.style.display = "none"; v2.style.display = "none"; v3.style.display = "block"; v4.style.display = "none";
+  } else if (cStep === 4) {
+    v4.innerHTML = successHTML();
+    v1.style.display = "none"; v2.style.display = "none"; v3.style.display = "none"; v4.style.display = "block";
+  }
+  bindCursor();
+}
+
+function deliveryHTML() {
+  return `
+    <h3>Delivery</h3>
+    <div class="r2">
+      <div class="field"><label>First Name</label><input type="text" name="first_name" placeholder="First name" value="${user?.name||''}" required></div>
+      <div class="field"><label>Last Name</label><input type="text" name="last_name" placeholder="Last name" required></div>
+    </div>
+    <div class="field"><label>Email</label><input type="email" name="email" value="${user?.email||''}" placeholder="your@email.com" required></div>
+    <div class="field"><label>Phone</label><input type="tel" name="phone" placeholder="+91 98765 43210" required></div>
+    <div class="field"><label>Street Address</label><input type="text" name="address" placeholder="House / Flat, Street, Area" required></div>
+    <div class="r2">
+      <div class="field"><label>City</label><input type="text" name="city" placeholder="City" required></div>
+      <div class="field"><label>PIN Code</label><input type="text" name="pincode" placeholder="110001" required></div>
+    </div>
+    <div class="field"><label>State</label>
+      <select name="state"><option>Manipur</option><option>Delhi</option><option>Maharashtra</option>
+      <option>Karnataka</option><option>Tamil Nadu</option><option>West Bengal</option>
+      <option>Rajasthan</option><option>Gujarat</option></select>
+    </div>
+    <button type="button" class="fb" onclick="nextStep()">Continue to Payment →</button>
+  `;
+}
+
+function paymentHTML() {
+  return `
+    <h3>Payment</h3>
+    <div class="pay-methods">
+      <button type="button" class="pm on" onclick="switchPay('card',this)">Card</button>
+      <button type="button" class="pm" onclick="switchPay('upi',this)">UPI</button>
+      <button type="button" class="pm" onclick="switchPay('nb',this)">Net Banking</button>
+      <button type="button" class="pm" onclick="switchPay('cod',this)">COD</button>
+    </div>
+    <input type="hidden" name="payment_method" id="hidden-paymode" value="card">
+    <div id="pfields">
+      <div class="field"><label>Card Number</label><input type="text" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)"></div>
+      <div class="r2">
+        <div class="field"><label>Expiry</label><input type="text" name="card_expiry" placeholder="MM / YY" maxlength="7"></div>
+        <div class="field"><label>CVV</label><input type="password" name="card_cvv" placeholder="•••" maxlength="3"></div>
+      </div>
+      <div class="field"><label>Cardholder Name</label><input type="text" name="card_name" placeholder="Full Name"></div>
+    </div>
+    <button type="button" class="fb" onclick="nextStep()">Review Order →</button>
+  `;
+}
+
+function switchPay(mode, btn) {
+  payMode = mode;
+  document.getElementById('hidden-paymode').value = mode;
+  document.querySelectorAll('.pm').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  const pf = document.getElementById('pfields');
+  
+  if (mode === 'card') {
+    pf.innerHTML = `
+      <div class="field"><label>Card Number</label><input type="text" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)"></div>
+      <div class="r2">
+        <div class="field"><label>Expiry</label><input type="text" name="card_expiry" placeholder="MM / YY" maxlength="7"></div>
+        <div class="field"><label>CVV</label><input type="password" name="card_cvv" placeholder="•••" maxlength="3"></div>
+      </div>
+      <div class="field"><label>Cardholder Name</label><input type="text" name="card_name" placeholder="Full Name"></div>
+    `;
+  } else if (mode === 'upi') {
+    pf.innerHTML = `<div class="field"><label>UPI ID</label><input type="text" name="upi_id" placeholder="name@upi"></div>`;
+  } else if (mode === 'nb') {
+    pf.innerHTML = `<div class="field"><label>Select Bank</label><select name="bank_name"><option>SBI</option><option>HDFC</option><option>ICICI</option><option>Axis Bank</option><option>Kotak Mahindra</option></select></div>`;
+  } else {
+    pf.innerHTML = `<div style="padding:1.25rem;background:var(--ghost);font-size:.77rem;line-height:1.9;color:var(--fog)">Cash on Delivery available. A ₹50 handling fee is added at delivery. Please keep the exact amount ready.</div>`;
+  }
+  bindCursor();
+}
+
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+
+function reviewHTML() {
+  const sub = cartSub(), sh = cartShip(), gr = cartGrand();
+  const itemsSummary = cart.map(c => `${c.name} (${c.size}) x${c.qty}`).join(', ');
+  
+  return `
+    <h3>Review Order</h3>
+    <input type="hidden" name="ordered_items" value="${itemsSummary}">
+    <input type="hidden" name="order_total" value="₹${gr.toLocaleString('en-IN')}">
+    
+    <div class="olines">
+      ${cart.map(c=>`<div class="oline"><span>${c.name} (${c.size}) ×${c.qty}</span><span>₹${(c.price*c.qty).toLocaleString('en-IN')}</span></div>`).join('')}
+      <div class="oline" style="color:var(--fog)"><span>Shipping</span><span>${sh===0?'Free':'₹'+sh}</span></div>
+      <div class="otot"><span>Total</span><span>₹${gr.toLocaleString('en-IN')}</span></div>
+    </div>
+    <p style="font-size:.72rem;line-height:1.95;color:var(--fog);margin-bottom:1.5rem">By placing your order you agree to Sclade's Terms of Service and Privacy Policy. Estimated delivery: 3–7 business days.</p>
+    <button type="button" class="fb" onclick="submitNetlifyForm()">Place Order — ₹${gr.toLocaleString('en-IN')}</button>
+  `;
+}
+
+function submitNetlifyForm() {
+  const form = document.getElementById('netlify-checkout-form');
+  const formData = new FormData(form);
+
+  fetch("/", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams(formData).toString()
+  })
+  .then(() => {
+    cart = []; 
+    renderCart(); 
+    nextStep();
+  })
+  .catch((error) => {
+    console.error("Netlify Form submission failed: ", error);
+    showToast("Checkout error. Please try again.");
+  });
+}
+
+function successHTML() {
+  const num = '#SCL' + Math.floor(10000 + Math.random() * 90000);
+  return `
+    <div class="success-w">
+      <div class="s-ring">✓</div>
+      <h3>Order Placed</h3>
+      <p>Your order <strong>${num}</strong> is confirmed.<br>
+      A receipt has been sent to <strong>${user?.email||'your email'}</strong>.<br><br>
+      Estimated delivery: 3–7 business days.<br>
+      We'll notify you when it ships.</p>
+      <button type="button" class="fb" style="max-width:240px;margin:2rem auto 0;display:block" onclick="closeMod('ckmod')">Continue Shopping</button>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
