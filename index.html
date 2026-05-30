@@ -21,6 +21,28 @@
   --mono:'DM Mono',monospace;
 }
 html{font-size:16px;scroll-behavior:smooth}
+  <div id="store-gallery" style="display: flex; flex-wrap: wrap; gap: 20px; padding: 50px 20px; justify-content: center; position: relative; z-index: 50;"></div>
+
+<script>
+  fetch('/inventory.json')
+    .then(response => response.json())
+    .then(data => {
+      const gallery = document.getElementById('store-gallery');
+      const items = data.thrift_items || [];
+      
+      items.forEach(item => {
+        const productCard = `
+          <div style="background: #111; border: 1px solid #333; border-radius: 10px; padding: 15px; text-align: center; width: 280px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <img src="${item.image}" alt="${item.title}" style="max-width: 100%; height: auto; border-radius: 5px; margin-bottom: 15px;">
+            <h3 style="color: #fff; margin: 0 0 10px 0; font-family: 'Jost', sans-serif; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;">${item.title}</h3>
+            <p style="color: #d8d5ce; font-size: 1.1rem; margin: 0;">${item.price}</p>
+          </div>
+        `;
+        gallery.innerHTML += productCard;
+      });
+    })
+    .catch(error => console.log("Waiting for items...", error));
+</script>
 body{
   background:var(--paper);color:var(--ink);
   font-family:var(--sans);font-weight:300;
