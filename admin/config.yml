@@ -1,0 +1,17 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# This is where your uploaded photos will be saved
+media_folder: "images" 
+public_folder: "/images"
+
+collections:
+  - name: "thrift_items"
+    label: "Thrift Items"
+    folder: "products" # This creates a folder to store the data for each item
+    create: true
+    fields:
+      - {label: "Item Name", name: "title", widget: "string"}
+      - {label: "Price", name: "price", widget: "string"}
+      - {label: "Image", name: "image", widget: "image"}
