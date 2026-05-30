@@ -167,54 +167,6 @@ section{padding:6rem 3rem}
 }
 .sec-label::after{content:'';flex:1;height:1px;background:var(--ash)}
 
-/* PRODUCT GRID */
-.pgrid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:3rem 2rem;
-}
-.pcard{cursor:none;position:relative}
-.pcard-img{
-  aspect-ratio:2/3;background:var(--ghost);
-  position:relative;overflow:hidden;margin-bottom:1.2rem;
-}
-.pcard-visual{
-  width:100%;height:100%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
-  transition:transform .7s cubic-bezier(.4,0,.2,1);
-}
-.pcard-icon{font-size:5rem;line-height:1}
-.pcard-mat{
-  font-family:var(--mono);font-size:.54rem;letter-spacing:.25em;
-  text-transform:uppercase;color:var(--ash);
-}
-.pcard:hover .pcard-visual{transform:scale(1.04)}
-.pcard-badge{
-  position:absolute;top:1rem;left:1rem;
-  background:var(--ink);color:var(--paper);
-  font-family:var(--mono);font-size:.54rem;letter-spacing:.15em;
-  padding:.3rem .65rem;text-transform:uppercase;
-}
-.pcard-overlay{
-  position:absolute;inset:0;background:rgba(8,8,8,.72);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .3s;
-}
-.pcard:hover .pcard-overlay{opacity:1}
-.pcard-obx{display:flex;flex-direction:column;gap:.75rem;width:68%}
-.pcard-btn{
-  width:100%;padding:.75rem;
-  border:1px solid var(--paper);background:transparent;color:var(--paper);
-  font-family:var(--sans);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
-  cursor:none;transition:background .25s,color .25s;
-}
-.pcard-btn.fill{background:var(--paper);color:var(--ink)}
-.pcard-btn:hover{background:var(--paper);color:var(--ink)}
-.pcard-btn.fill:hover{background:transparent;color:var(--paper)}
-.pcard-name{font-size:.88rem;letter-spacing:.05em;margin-bottom:.25rem;font-weight:400}
-.pcard-sub{font-size:.7rem;color:var(--fog);letter-spacing:.08em;margin-bottom:.4rem}
-.pcard-price{font-family:var(--mono);font-size:.78rem}
-
 /* EDITORIAL */
 .editorial{
   display:grid;grid-template-columns:1fr 1fr;
@@ -382,28 +334,6 @@ footer{
   display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;
 }
 
-/* DETAIL */
-.det-modal .modal{width:min(780px,100%)}
-.det-grid{display:grid;grid-template-columns:1fr 1fr}
-.det-img{
-  aspect-ratio:2/3;background:var(--ghost);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
-}
-.det-emoji{font-size:7rem;line-height:1}
-.det-mat{font-family:var(--mono);font-size:.54rem;letter-spacing:.25em;text-transform:uppercase;color:var(--ash)}
-.det-info{padding:3rem}
-.det-name{font-family:var(--serif);font-size:1.9rem;font-weight:300;line-height:1.1;margin-bottom:.4rem}
-.det-price{font-family:var(--mono);font-size:1rem;margin-bottom:1.5rem}
-.det-desc{font-size:.79rem;line-height:1.95;color:var(--fog);margin-bottom:2rem;letter-spacing:.03em}
-.sz-lbl{font-family:var(--mono);font-size:.57rem;letter-spacing:.2em;text-transform:uppercase;color:var(--fog);margin-bottom:.7rem}
-.szs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
-.sz{
-  padding:.5rem .9rem;border:1px solid var(--ash);background:none;
-  font-family:var(--mono);font-size:.67rem;cursor:none;
-  transition:all .2s;color:var(--ink);
-}
-.sz:hover,.sz.on{border-color:var(--ink);background:var(--ink);color:var(--paper)}
-
 /* CHECKOUT */
 .ck-modal .modal{width:min(680px,100%)}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ash)}
@@ -497,8 +427,6 @@ footer{
   .editorial{grid-template-columns:1fr}
   .ed-cell:first-child{border-right:none;border-bottom:1px solid var(--ash)}
   .newsletter{padding:4rem 1.25rem;flex-direction:column}
-  .det-grid{grid-template-columns:1fr}
-  .det-modal .modal{width:100%}
   footer{flex-direction:column;text-align:center}
   .r2{grid-template-columns:1fr}
 }
@@ -510,7 +438,6 @@ footer{
 <div id="loader"><div class="loader-word">SCLADE</div></div>
 <div class="toast" id="toast"></div>
 
-<!-- NAV -->
 <nav id="nav">
   <ul class="nav-left">
     <li><a href="#collection">Collection</a></li>
@@ -527,7 +454,6 @@ footer{
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-grid"></div>
   <p class="hero-side">SS 2025 — Limited Edition</p>
@@ -542,7 +468,6 @@ footer{
   </div>
 </section>
 
-<!-- TICKER -->
 <div class="ticker">
   <div class="ticker-track">
     <span>Restraint</span><span>—</span><span>Precision</span><span>—</span>
@@ -558,13 +483,11 @@ footer{
   </div>
 </div>
 
-<!-- COLLECTION -->
 <section id="collection">
   <div class="sec-label">01 — The Collection</div>
-  <div class="pgrid" id="pgrid"></div>
+  <div id="store-gallery" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; position: relative; z-index: 50; background-color: transparent;"></div>
 </section>
 
-<!-- EDITORIAL / ABOUT -->
 <div class="editorial" id="about">
   <div class="ed-cell">
     <div class="ed-num">01</div>
@@ -578,7 +501,6 @@ footer{
   </div>
 </div>
 
-<!-- NEWSLETTER -->
 <div class="newsletter">
   <div class="nl-left">
     <h2>Stay in the quiet</h2>
@@ -590,7 +512,6 @@ footer{
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
   <p class="footer-copy">© 2025 Sclade. All rights reserved.</p>
   <div class="footer-links">
@@ -601,10 +522,8 @@ footer{
   </div>
 </footer>
 
-<!-- DRAWER BG -->
 <div class="drawer-bg" id="dbg" onclick="closeDrawer()"></div>
 
-<!-- CART DRAWER -->
 <div class="cart-drawer" id="cdrawer">
   <div class="drawer-head">
     <h2>Shopping Bag</h2>
@@ -621,7 +540,6 @@ footer{
   </div>
 </div>
 
-<!-- LOGIN MODAL -->
 <div class="mbg" id="lmod" onclick="bgc(event,'lmod')">
   <div class="modal">
     <button class="mx" onclick="closeMod('lmod')">✕</button>
@@ -629,14 +547,12 @@ footer{
       <div class="l-logo">SCLADE</div>
       <p class="l-sub">Sign in to continue</p>
 
-      <!-- Google One Tap initialiser (hidden) -->
       <div id="g_id_onload"
            data-client_id="647753311601-v008q3264d08ql216ib3mu3td604ee0j.apps.googleusercontent.com"
            data-callback="handleCredentialResponse"
            data-auto_prompt="false">
       </div>
 
-      <!-- Official Google Sign-In button -->
       <div class="g-signin-wrap">
         <div class="g_id_signin"
              data-type="standard"
@@ -658,28 +574,6 @@ footer{
   </div>
 </div>
 
-<!-- DETAIL MODAL -->
-<div class="mbg det-modal" id="dmod" onclick="bgc(event,'dmod')">
-  <div class="modal">
-    <button class="mx" onclick="closeMod('dmod')">✕</button>
-    <div class="det-grid">
-      <div class="det-img">
-        <div class="det-emoji" id="demoji"></div>
-        <div class="det-mat" id="dmat"></div>
-      </div>
-      <div class="det-info">
-        <div class="det-name" id="dname"></div>
-        <div class="det-price" id="dprice"></div>
-        <div class="det-desc" id="ddesc"></div>
-        <div class="sz-lbl">Select Size</div>
-        <div class="szs" id="dszs"></div>
-        <button class="fb" onclick="addFromDetail()">Add to Bag</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CHECKOUT MODAL -->
 <div class="mbg ck-modal" id="ckmod" onclick="bgc(event,'ckmod')">
   <div class="modal">
     <button class="mx" onclick="closeMod('ckmod')">✕</button>
@@ -693,7 +587,6 @@ footer{
   </div>
 </div>
 
-<!-- CRAWLER BACKUP FOR DEPLOYMENT RECOGNITION -->
 <form name="checkout-form" method="POST" data-netlify="true" hidden>
   <input type="text" name="first_name">
   <input type="text" name="last_name">
@@ -749,50 +642,29 @@ function openMod(id) { document.getElementById(id).classList.add('on'); }
 function closeMod(id) { document.getElementById(id).classList.remove('on'); }
 function bgc(e, id) { if (e.target === document.getElementById(id)) closeMod(id); }
 
-/* PRODUCTS */
-const prods = [
-  {id:1,name:'Column Coat',type:'Outerwear',mat:'Virgin Wool',price:18500,emoji:'🧥',badge:'New',desc:'A single column of pressed wool that falls in one unwavering line. Two interior pockets, clean horn-button closure, zero external hardware. Fully unlined for quiet drape.'},
-  {id:2,name:'Void Trouser',type:'Trousers',mat:'Japanese Cotton',price:9200,emoji:'👖',badge:'',desc:'Wide-leg trousers cut from deadstock Japanese cotton twill. High rise, relaxed through the thigh, tapered below the knee. Invisible side-seam pockets.'},
-  {id:3,name:'Silence Shirt',type:'Tops',mat:'Organic Cotton',price:7400,emoji:'👔',badge:'Limited',desc:'Oversized woven shirt in 100% organic cotton. Drop shoulder, single chest pocket. The fabric speaks. The details stay quiet.'},
-  {id:4,name:'Arc Dress',type:'Dresses',mat:'Deadstock Linen',price:13800,emoji:'👗',badge:'New',desc:'The entire silhouette reads as one arcing gesture. Falls mid-calf, side seam pockets, concealed back zip. Available in chalk and carbon.'},
-  {id:5,name:'Grain Knit',type:'Knitwear',mat:'Merino Wool',price:11200,emoji:'🧶',badge:'',desc:'Boxy ribbed knit in salt-and-pepper merino. Crew neck, dropped shoulders, relaxed body. Grows more beautiful with every wear.'},
-  {id:6,name:'Form Blazer',type:'Tailoring',mat:'Italian Wool',price:22000,emoji:'🥼',badge:'Bestseller',desc:'Single-button blazer with structured shoulders and clean back vent. Unlined for lightness, hand-stitched lapels, notched chest pocket.'},
-  {id:7,name:'Seam Trench',type:'Outerwear',mat:'Cotton Gabardine',price:24500,emoji:'🧣',badge:'',desc:'A trench stripped to its structural logic. Double-breasted, storm-flap collar, belted. Nothing decorative. Everything necessary.'},
-  {id:8,name:'Plane Tee',type:'Tops',mat:'Pima Cotton',price:4200,emoji:'👕',badge:'',desc:'The foundation. A perfect-weight pima cotton tee with micro-dropped shoulders and imperceptibly longer back hem. Washes beautifully.'},
-];
 
-/* RENDER PRODUCTS */
-document.getElementById('pgrid').innerHTML = prods.map(p => `
-  <div class="pcard">
-    <div class="pcard-img">
-      <div class="pcard-visual">
-        <div class="pcard-icon">${p.emoji}</div>
-        <div class="pcard-mat">${p.mat}</div>
-      </div>
-      ${p.badge?`<div class="pcard-badge">${p.badge}</div>`:''}
-      <div class="pcard-overlay">
-        <div class="pcard-obx">
-          <button class="pcard-btn fill" onclick="qadd(${p.id})">Quick Add</button>
-          <button class="pcard-btn" onclick="openDetail(${p.id})">View Details</button>
+/* YOUR CUSTOM CMS FETCH SCRIPT */
+fetch('./inventory.json')
+  .then(response => response.json())
+  .then(data => {
+    const gallery = document.getElementById('store-gallery');
+    const items = data.thrift_items || [];
+    
+    items.forEach(item => {
+      const productCard = `
+        <div style="background: #111; border: 1px solid #333; border-radius: 10px; padding: 15px; text-align: center; width: 280px; box-shadow: 0 4px 6px rgba(0,0,0,0.5);">
+          <img src="${item.image}" alt="${item.title}" style="max-width: 100%; height: auto; border-radius: 5px; margin-bottom: 15px;">
+          <h3 style="color: #fff; margin: 0 0 10px 0; font-family: sans-serif; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;">${item.title}</h3>
+          <p style="color: #d8d5ce; font-size: 1.1rem; margin: 0; font-weight: bold;">${item.price}</p>
         </div>
-      </div>
-    </div>
-    <div class="pcard-name">${p.name}</div>
-    <div class="pcard-sub">${p.type}</div>
-    <div class="pcard-price">₹${p.price.toLocaleString('en-IN')}</div>
-  </div>
-`).join('');
+      `;
+      gallery.innerHTML += productCard;
+    });
+  })
+  .catch(error => console.log("Error loading items:", error));
 
-/* RE-BIND cursor for dynamic elements */
-function bindCursor() {
-  document.querySelectorAll('a,button').forEach(el => {
-    el.onmouseenter = () => cur.classList.add('grow');
-    el.onmouseleave = () => cur.classList.remove('grow');
-  });
-}
-bindCursor();
 
-/* CART */
+/* CART ENGINE */
 let cart = [], user = null, activeProd = null, chSz = 'M';
 
 function cartSub()  { return cart.reduce((a,c) => a + c.price * c.qty, 0); }
@@ -827,7 +699,6 @@ function renderCart() {
   document.getElementById('csub').textContent  = '₹' + sub.toLocaleString('en-IN');
   document.getElementById('cship').textContent = sh === 0 ? 'Free' : '₹' + sh;
   document.getElementById('ctot').textContent  = '₹' + cartGrand().toLocaleString('en-IN');
-  bindCursor();
 }
 
 function rmItem(i) { cart.splice(i,1); renderCart(); }
@@ -837,8 +708,6 @@ function addToCart(p, sz) {
   if (ex) ex.qty++; else cart.push({...p,size:sz,qty:1});
   renderCart(); showToast(p.name + ' added to bag');
 }
-
-function qadd(id) { addToCart(prods.find(p => p.id===id), 'M'); }
 
 /* DRAWER */
 function openDrawer() {
@@ -904,7 +773,6 @@ function setAuthArea() {
   } else {
     a.innerHTML = `<button class="nav-act" onclick="openMod('lmod')">Sign In</button>`;
   }
-  bindCursor();
 }
 
 function emailLogin() {
@@ -914,29 +782,6 @@ function emailLogin() {
   const initials = name.slice(0,2).toUpperCase();
   user = { name, email, picture:'', initials, token: null };
   setAuthArea(); closeMod('lmod'); showToast('Welcome, ' + name);
-}
-
-/* DETAIL */
-function openDetail(id) {
-  activeProd = prods.find(p => p.id===id); chSz = 'M';
-  document.getElementById('demoji').textContent = activeProd.emoji;
-  document.getElementById('dmat').textContent   = activeProd.mat;
-  document.getElementById('dname').textContent  = activeProd.name;
-  document.getElementById('dprice').textContent = '₹' + activeProd.price.toLocaleString('en-IN');
-  document.getElementById('ddesc').textContent  = activeProd.desc;
-  const szs = ['XS','S','M','L','XL'];
-  document.getElementById('dszs').innerHTML = szs.map(s =>
-    `<button class="sz${s==='M'?' on':''}" onclick="pickSz('${s}',this)">${s}</button>`
-  ).join('');
-  openMod('dmod'); bindCursor();
-}
-function pickSz(s, btn) {
-  chSz = s;
-  document.querySelectorAll('#dszs .sz').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-}
-function addFromDetail() {
-  addToCart(activeProd, chSz); closeMod('dmod');
 }
 
 /* ── CHECKOUT ENGINE WITH GLOBAL DATA RETENTION ─────────────────── */
@@ -955,7 +800,6 @@ function startCheckout() {
     <form method="POST" data-netlify="true" name="checkout-form" id="netlify-checkout-form" onsubmit="event.preventDefault();">
       <input type="hidden" name="form-name" value="checkout-form" />
       
-      <!-- Persistent View Modules -->
       <div id="step-delivery-view"></div>
       <div id="step-payment-view" style="display:none;"></div>
       <div id="step-review-view" style="display:none;"></div>
@@ -1005,7 +849,6 @@ function renderStep() {
     v4.innerHTML = successHTML();
     v1.style.display = "none"; v2.style.display = "none"; v3.style.display = "none"; v4.style.display = "block";
   }
-  bindCursor();
 }
 
 function deliveryHTML() {
@@ -1076,7 +919,6 @@ function switchPay(mode, btn) {
   } else {
     pf.innerHTML = `<div style="padding:1.25rem;background:var(--ghost);font-size:.77rem;line-height:1.9;color:var(--fog)">Cash on Delivery available. A ₹50 handling fee is added at delivery. Please keep the exact amount ready.</div>`;
   }
-  bindCursor();
 }
 
 function fmtCard(el) {
@@ -1137,28 +979,6 @@ function successHTML() {
     </div>
   `;
 }
-</script>
-  <div id="store-gallery" style="display: flex; flex-wrap: wrap; gap: 20px; padding: 50px 20px; justify-content: center; position: relative; z-index: 99999; background-color: #050505;"></div>
-
-<script>
-  fetch('./inventory.json')
-    .then(response => response.json())
-    .then(data => {
-      const gallery = document.getElementById('store-gallery');
-      const items = data.thrift_items || [];
-      
-      items.forEach(item => {
-        const productCard = `
-          <div style="background: #111; border: 1px solid #333; border-radius: 10px; padding: 15px; text-align: center; width: 280px; box-shadow: 0 4px 6px rgba(0,0,0,0.5);">
-            <img src="${item.image}" alt="${item.title}" style="max-width: 100%; height: auto; border-radius: 5px; margin-bottom: 15px;">
-            <h3 style="color: #fff; margin: 0 0 10px 0; font-family: sans-serif; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;">${item.title}</h3>
-            <p style="color: #d8d5ce; font-size: 1.1rem; margin: 0; font-weight: bold;">${item.price}</p>
-          </div>
-        `;
-        gallery.innerHTML += productCard;
-      });
-    })
-    .catch(error => console.log("Error loading items:", error));
 </script>
 
 </body>
